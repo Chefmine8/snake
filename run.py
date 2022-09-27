@@ -13,10 +13,10 @@ class Game:
         self.object = object(0, 0)
         self.move = 0
         self.area = pygame.Rect(0, 0, 1280, 720)
-        self.object.x = random.randrange(30, 1240, 10)
-        self.object.y = random.randrange(30, 680, 10)
+        self.object.x = random.randrange(30, 1240, 30)
+        self.object.y = random.randrange(30, 680, 30)
         self.score = 0
-        self.serpent_corp = 10
+        self.serpent_corp = 30
         self.snake.position_tete_x.append(1)
         self.snake.position_tete_y.append(1)
         self.compteur_3 = 0
@@ -73,7 +73,7 @@ class Game:
         if self.score >= 5:
             self.snake.speed = 0.04
 
-        if self.score >= 10:
+        if self.score >= 30:
             self.snake.speed = 0.02
 
 
@@ -95,8 +95,8 @@ class Game:
         if self.object.y == self.snake.y and self.object.x == self.snake.x:
             self.score += 1
             self.compteur_3 += 1
-            self.object.x = random.randrange(30, 1240, 10)
-            self.object.y = random.randrange(30, 680, 10)
+            self.object.x = random.randrange(30, 1240, 30)
+            self.object.y = random.randrange(30, 680, 30)
             self.snake.position_tete_x.append(self.snake.x)
             self.snake.position_tete_y.append(self.snake.y)
 
@@ -113,7 +113,7 @@ class Game:
             self.compteur_2 = self.compteur_2 + 1
         self.snake.draw(self.screen)
         pygame.draw.rect(self.screen, (255,255,255), (0, 0, 1280, 720),3)
-        self.create_message('big', '{}'.format(str(self.score)), (30, 10, 100, 50), (0,0,0))
+        self.create_message('big', '{}'.format(str(self.score)), (10, 10, 100, 50), (0,0,0))
         pygame.display.flip()
 
     def create_message(self, font, message, message_rectangle, color):
