@@ -23,6 +23,7 @@ class Game:
         self.yep = 0
 
     def handling_events(self):
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -93,6 +94,8 @@ class Game:
         self.snake.position_tete_y.append(self.snake.y)
 
         if self.object.y == self.snake.y and self.object.x == self.snake.x:
+            pygame.mixer.music.load('./sound/touch.mp3')
+            pygame.mixer.music.play()
             self.score += 1
             self.compteur_3 += 1
             self.object.x = random.randrange(30, 1240, 30)
@@ -102,7 +105,6 @@ class Game:
 
         if self.snake.x > 1280 or self.snake.x < 0 or self.snake.y > 720 or self.snake.y < 0:
             self.running = False
-
 
     def display(self):
         self.screen.fill("#065306")
