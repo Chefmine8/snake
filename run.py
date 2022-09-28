@@ -21,6 +21,10 @@ class Game:
         self.snake.position_tete_y.append(1)
         self.compteur_3 = 0
         self.yep = 0
+        self.f = open('./option.txt', "r")
+        self.best = int(self.f.read())
+        self.f.close()
+        print(self.best)
 
     def handling_events(self):
 
@@ -102,6 +106,10 @@ class Game:
             self.object.y = random.randrange(30, 680, 30)
             self.snake.position_tete_x.append(self.snake.x)
             self.snake.position_tete_y.append(self.snake.y)
+            if self.best < self.score:
+                self.f = open('./option.txt', "w")
+                self.f.write(str(self.score))
+                self.f.close()
 
         if self.snake.x > 1280 or self.snake.x < 0 or self.snake.y > 720 or self.snake.y < 0:
             self.running = False
@@ -115,7 +123,8 @@ class Game:
             self.compteur_2 = self.compteur_2 + 1
         self.snake.draw(self.screen)
         pygame.draw.rect(self.screen, (255,255,255), (0, 0, 1280, 720),3)
-        self.create_message('big', '{}'.format(str(self.score)), (10, 10, 100, 50), (0,0,0))
+        self.create_message('big', 'Score :{}'.format(str(self.score)), (10, 10, 100, 50), (0,0,0))
+        self.create_message('big', 'Best score :{}'.format(str(self.best)), (10, 50, 100, 50), (0, 0, 0))
         pygame.display.flip()
 
     def create_message(self, font, message, message_rectangle, color):
