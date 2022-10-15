@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+from datetime import datetime
 from object import object
 from snake import snake
 
@@ -11,6 +12,15 @@ class Game:
         self.running = True
         self.snake = snake(0, 0)
         self.object = object(0, 0)
+        datetime.now()
+        self.time_second = float(datetime.now().strftime('%S'))
+        self.time_second_new = float(datetime.now().strftime('%S'))
+        self.s1 = 0
+        self.time_min_print = 0
+        self.time_heure_print = 0
+        #print(self.time_second)
+        #print(self.time_min)
+        #print(self.time_heure)
         self.snake.position_tete_x = []
         self.snake.position_tete_y = []
         self.move = 0
@@ -20,11 +30,13 @@ class Game:
         self.score = 0
         self.serpent_corp = 30
         self.compteur_3 = 0
+        self.start = 1
         self.yep = 0
         self.f = open('./option.txt', "r")
         self.best = int(self.f.read())
         self.f.close()
-        print(self.best)
+        self.score_2 = 0
+        #print(self.best)
 
     def handling_events(self):
 
@@ -66,26 +78,43 @@ class Game:
                 pygame.display.flip()
 
         if self.move == 1 :
+            self.snake.angle = pygame.transform.rotate(self.snake.image, 180)
             self.snake.x -= self.snake.distance
             time.sleep(self.snake.speed)
         if self.move == 2:
+            self.snake.angle = pygame.transform.rotate(self.snake.image, 0)
             self.snake.x += self.snake.distance
             time.sleep(self.snake.speed)
         if self.move == 3:
+            self.snake.angle = pygame.transform.rotate(self.snake.image, 90)
             self.snake.y -= self.snake.distance
             time.sleep(self.snake.speed)
         if self.move == 4:
+            self.snake.angle = pygame.transform.rotate(self.snake.image, 270)
             self.snake.y += self.snake.distance
             time.sleep(self.snake.speed)
 
-        if self.score >= 5:
-            self.snake.speed = 0.04
-
-        if self.score >= 10:
-            self.snake.speed = 0.03
-
 
     def update(self):
+
+        self.time_second = float(datetime.now().strftime('%S'))
+
+        if self.time_second > self.time_second_new:
+            self.s1 += 1
+            self.time_second_new = float(datetime.now().strftime('%S'))
+
+        if self.s1 == 60:
+            self.time_min_print += 1
+            self.s1 = 0
+
+        if self.time_min_print == 60:
+            self.time_min_print = 0
+            self.time_heure_print += 1
+
+        self.time_s = str(self.s1)
+        self.time_m = str(self.time_min_print)
+        self.time_h = str(self.time_heure_print)
+
         if not self.snake.position_tete_x:
             print()
         else:
@@ -103,21 +132,42 @@ class Game:
         self.snake.position_tete_x.append(self.snake.x)
         self.snake.position_tete_y.append(self.snake.y)
 
+        if self.start == 1:
+            self.start = 0
+            self.compteur_3 += 1
+            self.snake.position_tete_x.append(self.snake.x)
+            self.snake.position_tete_y.append(self.snake.y)
+            self.move = 2
+
+
         if self.object.y == self.snake.y and self.object.x == self.snake.x:
             pygame.mixer.music.load('./sound/touch.mp3')
             pygame.mixer.music.play()
             self.score += 1
+            print(self.score, self.snake.speed)
             self.compteur_3 += 1
             self.object.x = random.randrange(30, 1240, 30)
             self.object.y = random.randrange(30, 680, 30)
             self.snake.position_tete_x.append(self.snake.x)
             self.snake.position_tete_y.append(self.snake.y)
+            self.start = 0
             if self.best < self.score:
                 self.f = open('./option.txt', "w")
                 self.f.write(str(self.score))
                 self.f.close()
 
-        if self.snake.x > 1280 or self.snake.x < 0 or self.snake.y > 720 or self.snake.y < 0:
+            if self.score_2 < self.score:
+                if self.score < 5:
+                    #print(self.snake.speed)
+                    self.snake.speed = self.snake.speed - 0.01
+                    self.score_2 += 1
+                elif self.score < 12:
+                    self.snake.speed = self.snake.speed - 0.002
+                    self.score_2 += 1
+                else:
+                    return 'nop'
+
+        if self.snake.x > 1280 or self.snake.x < -10 or self.snake.y > 720 or self.snake.y < -10:
             self.__init__(screen)
 
     def display(self):
@@ -133,6 +183,10 @@ class Game:
         pygame.draw.rect(self.screen, (255,255,255), (0, 0, 1280, 720),3)
         self.create_message('big', 'Score :{}'.format(str(self.score)), (10, 10, 100, 50), (0,0,0))
         self.create_message('big', 'Best score :{}'.format(str(self.best)), (10, 50, 100, 50), (0, 0, 0))
+        self.create_message('big', 'Time :{}'.format(str(self.time_h)), (520, 10, 50, 500), (0,0,0))
+        self.create_message('big', '{}'.format(str(self.time_m)), (670, 10, 50, 500), (0, 0, 0))
+        self.create_message('big', '{}'.format(str(self.time_s)), (720, 10, 50, 500), (0, 0, 0))
+        self.create_message('big', 'Speed : {}'.format(str(self.snake.speed)), (1040, 10, 100, 500), (0, 0, 0))
         pygame.display.flip()
 
     def create_message(self, font, message, message_rectangle, color):
@@ -158,6 +212,7 @@ class Game:
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
+pygame.display.set_caption('Snake')
 game = Game(screen)
 game.run()
 
