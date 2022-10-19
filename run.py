@@ -44,18 +44,26 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
         keys= pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.move = 1
-            self.yep = 0
-        if keys[pygame.K_RIGHT]:
-            self.move = 2
-            self.yep = 0
-        if keys[pygame.K_UP]:
-            self.move = 3
-            self.yep = 0
-        if keys[pygame.K_DOWN]:
-            self.move = 4
-            self.yep = 0
+
+        if self.move != 2:
+            if keys[pygame.K_LEFT]:
+                self.move = 1
+                self.yep = 0
+
+        if self.move != 1:
+            if keys[pygame.K_RIGHT]:
+                self.move = 2
+                self.yep = 0
+
+        if self.move != 4:
+            if keys[pygame.K_UP]:
+                self.move = 3
+                self.yep = 0
+
+        if self.move != 3:
+            if keys[pygame.K_DOWN]:
+                self.move = 4
+                self.yep = 0
         if keys[pygame.K_SPACE]:
             self.move = 5
 
@@ -77,6 +85,7 @@ class Game:
 
                 pygame.display.flip()
 
+
         if self.move == 1 :
             self.snake.angle = pygame.transform.rotate(self.snake.image, 180)
             self.snake.x -= self.snake.distance
@@ -96,8 +105,12 @@ class Game:
 
 
     def update(self):
+        self.x_o = self.object.x
+        self.y_o = self.object.y
 
         self.time_second = float(datetime.now().strftime('%S'))
+        if self.time_second == 0:
+            self.time_second_new = float(datetime.now().strftime('%S'))
 
         if self.time_second > self.time_second_new:
             self.s1 += 1
@@ -132,8 +145,8 @@ class Game:
         self.snake.position_tete_x.append(self.snake.x)
         self.snake.position_tete_y.append(self.snake.y)
 
-        if self.start == 1:
-            self.start = 0
+        if self.start == 2 or self.start == 1:
+            self.start += 1
             self.compteur_3 += 1
             self.snake.position_tete_x.append(self.snake.x)
             self.snake.position_tete_y.append(self.snake.y)
@@ -147,7 +160,17 @@ class Game:
             print(self.score, self.snake.speed)
             self.compteur_3 += 1
             self.object.x = random.randrange(30, 1240, 30)
+            #print(self.snake.position_tete_x)
+            #print(self.snake.position_tete_y)
+
+            if self.x_o == self.object.x:
+                self.object.x = random.randrange(30, 1240, 30)
+
             self.object.y = random.randrange(30, 680, 30)
+
+            if self.y_o == self.object.y:
+                self.object.y = random.randrange(30, 680, 30)
+
             self.snake.position_tete_x.append(self.snake.x)
             self.snake.position_tete_y.append(self.snake.y)
             self.start = 0
