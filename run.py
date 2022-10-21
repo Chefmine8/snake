@@ -3,6 +3,8 @@ import random
 import time
 from datetime import datetime
 from object import object
+from golden_ball import golden
+from snack import snack
 from snake import snake
 
 class Game:
@@ -12,6 +14,8 @@ class Game:
         self.running = True
         self.snake = snake(0, 0)
         self.object = object(0, 0)
+        self.golden = golden(0, 0)
+        self.snack = snack(0, 0)
         datetime.now()
         self.time_second = float(datetime.now().strftime('%S'))
         self.time_second_new = float(datetime.now().strftime('%S'))
@@ -27,6 +31,8 @@ class Game:
         self.area = pygame.Rect(0, 0, 1280, 720)
         self.object.x = random.randrange(30, 1240, 30)
         self.object.y = random.randrange(30, 680, 30)
+        self.snack.x = random.randrange(30, 1240, 30)
+        self.snack.y = random.randrange(30, 680, 30)
         self.score = 0
         self.serpent_corp = 30
         self.compteur_3 = 0
@@ -42,6 +48,7 @@ class Game:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                print(self.time_s, self.time_m, self.time_h)
                 self.running = False
         keys= pygame.key.get_pressed()
 
@@ -140,6 +147,7 @@ class Game:
             while self.compteur_3 >= 1 and self.compteur_2 <= self.compteur_4:
                 if self.snake.y == self.snake.position_tete_y[self.compteur_2] and self.snake.x == self.snake.position_tete_x[self.compteur_2]:
                     self.__init__(screen)
+                    print(self.time_h, self.time_m, self.time_s)
                 self.compteur_2 += 1
 
         self.snake.position_tete_x.append(self.snake.x)
@@ -190,12 +198,81 @@ class Game:
                 else:
                     return 'nop'
 
-        if self.snake.x > 1280 or self.snake.x < -10 or self.snake.y > 720 or self.snake.y < -10:
+        if self.snack.y == self.snake.y and self.snack.x == self.snake.x:
+            pygame.mixer.music.load('./sound/touch.mp3')
+            pygame.mixer.music.play()
+            self.score += 1
+            print(self.score, self.snake.speed)
+            self.compteur_3 += 1
+            self.snack.x = random.randrange(30, 1240, 30)
+            #print(self.snake.position_tete_x)
+            #print(self.snake.position_tete_y)
+
+            if self.x_o == self.snack.x:
+                self.snake.x = random.randrange(30, 1240, 30)
+
+            self.snack.y = random.randrange(30, 680, 30)
+
+            if self.y_o == self.snack.y:
+                self.snack.y = random.randrange(30, 680, 30)
+
+            self.snake.position_tete_x.append(self.snake.x)
+            self.snake.position_tete_y.append(self.snake.y)
+            self.start = 0
+            if self.best < self.score:
+                self.f = open('./option.txt', "w")
+                self.f.write(str(self.score))
+                self.f.close()
+
+            if self.score_2 < self.score:
+                if self.score < 5:
+                    #print(self.snake.speed)
+                    self.snake.speed = self.snake.speed - 0.01
+                    self.score_2 += 1
+                elif self.score < 12:
+                    self.snake.speed = self.snake.speed - 0.002
+                    self.score_2 += 1
+                else:
+                    return 'nop'
+
+        if self.golden.y == self.snake.y and self.golden.x == self.snake.x:
+            pygame.mixer.music.load('./sound/touch.mp3')
+            pygame.mixer.music.play()
+            self.score += 1
+            print(self.score, self.snake.speed)
+            self.compteur_3 += 10
+            for i in range(10):
+                self.snake.position_tete_x.append(self.snake.x)
+                self.snake.position_tete_y.append(self.snake.y)
+
+            self.start = 0
+            if self.best < self.score:
+                self.f = open('./option.txt', "w")
+                self.f.write(str(self.score))
+                self.f.close()
+
+            for i in range(9):
+                if self.score_2 < self.score:
+                    if self.score < 5:
+                        self.snake.speed = self.snake.speed - 0.01
+                        self.score_2 += 1
+                        self.score += 1
+                    elif self.score < 12:
+                        self.snake.speed = self.snake.speed - 0.002
+                        self.score_2 += 1
+                        self.score += 1
+                    else:
+                        self.score+=1
+
+        if self.snake.x > 1280 or self.snake.x < -10 or self.snake.y > 710 or self.snake.y < -10:
+            print(self.time_h, self.time_m, self.time_s)
             self.__init__(screen)
 
     def display(self):
         self.screen.fill("#065306")
         self.object.draw(self.screen)
+        self.golden.draw(self.screen)
+        self.snack.draw(self.screen)
         self.compteur_2 = 0
         while self.compteur_2 != self.compteur_3:
             self.snake.position_x = self.snake.position_tete_x[self.compteur_2]
