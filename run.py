@@ -111,7 +111,7 @@ class Game:
             time.sleep(self.snake.speed)
 
 
-    def update(self):
+    def update(self, difficulty):
         self.x_o = self.object.x
         self.y_o = self.object.y
 
@@ -235,7 +235,7 @@ class Game:
                 else:
                     return 'nop'
 
-        if self.golden.y == self.snake.y and self.golden.x == self.snake.x:
+        if difficulty == "hard" and self.golden.y == self.snake.y and self.golden.x == self.snake.x:
             pygame.mixer.music.load('./sound/touch.mp3')
             pygame.mixer.music.play()
             self.score += 1
@@ -268,10 +268,11 @@ class Game:
             print(self.time_h, self.time_m, self.time_s)
             self.__init__(screen)
 
-    def display(self):
+    def display(self, difficuly):
         self.screen.fill("#065306")
         self.object.draw(self.screen)
-        self.golden.draw(self.screen)
+        if difficulty == "hard":
+            self.golden.draw(self.screen)
         self.snack.draw(self.screen)
         self.compteur_2 = 0
         while self.compteur_2 != self.compteur_3:
@@ -306,9 +307,11 @@ class Game:
     def run(self):
         while self.running:
             self.handling_events()
-            self.update()
-            self.display()
+            self.update(difficulty)
+            self.display(difficulty)
             #self.create_message()
+
+difficulty = input("hard or easy ? ")
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
