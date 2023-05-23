@@ -1,4 +1,3 @@
-#import les librairies nécessaire.
 import pygame
 import random
 import time
@@ -8,9 +7,57 @@ from golden_ball import golden
 from snack import snack
 from snake import snake
 
-class Game:
+class Title:
     def __init__(self, screen):
-        #déclaration de toute les variables.
+        self.screen = screen
+
+    def draw_title_screen(self):
+        image = pygame.image.load("./image/t.jpg")
+        scaled_image = pygame.transform.scale(image, (1280, 720))
+        self.screen.blit(scaled_image, (0, 0))
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse button
+                        mouse_pos = pygame.mouse.get_pos()
+                        if easy_button_rect.collidepoint(mouse_pos):
+                            running = False
+                            return "easy"
+                        elif hard_button_rect.collidepoint(mouse_pos):
+                            running = False
+                            return "hard"
+
+            self.screen.fill((0, 0, 0))
+            self.draw_title_screen()
+
+            # Draw buttons
+            easy_button_rect = pygame.Rect(400, 300, 200, 100)
+            hard_button_rect = pygame.Rect(700, 300, 200, 100)
+            pygame.draw.rect(self.screen, (255, 0, 0), easy_button_rect)
+            pygame.draw.rect(self.screen, (0, 0, 255), hard_button_rect)
+
+            # Button labels
+            font = pygame.font.SysFont("Arial", 30)
+            easy_label = font.render("Easy", True, (255, 255, 255))
+            hard_label = font.render("Hard", True, (255, 255, 255))
+            self.screen.blit(easy_label, (450, 330))
+            self.screen.blit(hard_label, (750, 330))
+
+            pygame.display.flip()
+
+        return None
+
+
+class Game:
+    def __init__(self, screen, difficulty):
+        self.screen = screen
+        self.difficulty = difficulty
+        # déclaration de toute les variables.
         self.screen = screen
         self.pause = False
         self.running = True
@@ -42,21 +89,18 @@ class Game:
         self.f.close()
         self.score_2 = 0
 
-
     def handling_events(self):
-        #Gere le déplacement et gere la pause.
+        # Gere le déplacement et gere la pause.
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print(self.time_s, self.time_m, self.time_h)
                 self.running = False
-        keys= pygame.key.get_pressed()
+        keys = pygame.key.get_pressed()
 
         if keys[pygame.K_BACKSPACE]:
-            
             print(self.time_s, self.time_m, self.time_h)
             self.running = False
-
 
         if self.move != 2:
             if keys[pygame.K_LEFT]:
@@ -79,9 +123,8 @@ class Game:
                 self.yep = 0
         if keys[pygame.K_SPACE]:
             self.move = 5
-        
 
-        if self.move == 5 :
+        if self.move == 5:
             time.sleep(self.snake.speed)
             self.pause = True
             while self.pause == True:
@@ -95,12 +138,11 @@ class Game:
                             self.move = 0
                             self.yep = 1
                             self.running = True
-                self.screen.fill((0,0,0))
+                self.screen.fill((0, 0, 0))
 
                 pygame.display.flip()
 
-
-        if self.move == 1 :
+        if self.move == 1:
             self.snake.angle = pygame.transform.rotate(self.snake.image, 180)
             self.snake.x -= self.snake.distance
             time.sleep(self.snake.speed)
@@ -117,13 +159,12 @@ class Game:
             self.snake.y += self.snake.distance
             time.sleep(self.snake.speed)
 
-
     def update(self, difficulty):
-        #Recupere les coordoné de la pomme.
+        # Recupere les coordoné de la pomme.
         self.x_o = self.object.x
         self.y_o = self.object.y
-        
-        #Permet de géré le chrono.
+
+        # Permet de géré le chrono.
         self.time_second = float(datetime.now().strftime('%S'))
         if self.time_second == 0:
             self.time_second_new = float(datetime.now().strftime('%S'))
@@ -154,7 +195,8 @@ class Game:
         self.compteur_4 = self.compteur_3 - 1
         if self.yep == 0:
             while self.compteur_3 >= 1 and self.compteur_2 <= self.compteur_4:
-                if self.snake.y == self.snake.position_tete_y[self.compteur_2] and self.snake.x == self.snake.position_tete_x[self.compteur_2]:
+                if self.snake.y == self.snake.position_tete_y[self.compteur_2] and self.snake.x == \
+                        self.snake.position_tete_x[self.compteur_2]:
                     self.__init__(screen)
                     print(self.time_h, self.time_m, self.time_s)
                 self.compteur_2 += 1
@@ -169,7 +211,7 @@ class Game:
             self.snake.position_tete_y.append(self.snake.y)
             self.move = 2
 
-        #Permet de manger la 1er pomme.
+        # Permet de manger la 1er pomme.
         if self.object.y == self.snake.y and self.object.x == self.snake.x:
             pygame.mixer.music.load('./sound/eat.mp3')
             pygame.mixer.music.play()
@@ -204,7 +246,7 @@ class Game:
                 else:
                     return 'nop'
 
-        #Permet de manger la 2e pomme.
+        # Permet de manger la 2e pomme.
         if self.snack.y == self.snake.y and self.snack.x == self.snake.x:
             pygame.mixer.music.load('./sound/eat.mp3')
             pygame.mixer.music.play()
@@ -238,8 +280,8 @@ class Game:
                     self.score_2 += 1
                 else:
                     return 'nop'
-                
-        #Permet de manger la pomme doré, cela est possible uniquement en mode hard. 
+
+        # Permet de manger la pomme doré, cela est possible uniquement en mode hard.
         if difficulty == "hard" and self.golden.y == self.snake.y and self.golden.x == self.snake.x:
             pygame.mixer.music.load('./sound/eat.mp3')
             pygame.mixer.music.play()
@@ -267,35 +309,36 @@ class Game:
                         self.score_2 += 1
                         self.score += 1
                     else:
-                        self.score+=1
+                        self.score += 1
 
         if self.snake.x > 1280 or self.snake.x < -10 or self.snake.y > 710 or self.snake.y < -10:
             print(self.time_h, self.time_m, self.time_s)
             self.__init__(screen)
 
-    #Permet de tout afficher.
+    # Permet de tout afficher.
     def display(self, difficuly):
         self.screen.fill("#065306")
         self.object.draw(self.screen)
         if difficulty == "hard":
-            self.golden.draw(self.screen) #Affiche la pomme doré uniquement si 
+            self.golden.draw(self.screen)  # Affiche la pomme doré uniquement si
         self.snack.draw(self.screen)
         self.compteur_2 = 0
         while self.compteur_2 != self.compteur_3:
             self.snake.position_x = self.snake.position_tete_x[self.compteur_2]
             self.snake.position_y = self.snake.position_tete_y[self.compteur_2]
-            pygame.draw.rect(self.screen, (0, 255, 0), (self.snake.position_x, self.snake.position_y, self.serpent_corp, self.serpent_corp))
+            pygame.draw.rect(self.screen, (0, 255, 0),
+                             (self.snake.position_x, self.snake.position_y, self.serpent_corp, self.serpent_corp))
             self.compteur_2 = self.compteur_2 + 1
         self.snake.draw(self.screen)
-        pygame.draw.rect(self.screen, (255,255,255), (0, 0, 1280, 720),3)
-        self.create_message('big', 'Score :{}'.format(str(self.score)), (10, 10, 100, 50), (0,0,0))
+        pygame.draw.rect(self.screen, (255, 255, 255), (0, 0, 1280, 720), 3)
+        self.create_message('big', 'Score :{}'.format(str(self.score)), (10, 10, 100, 50), (0, 0, 0))
         self.create_message('big', 'Best score :{}'.format(str(self.best)), (10, 50, 100, 50), (0, 0, 0))
-        self.create_message('big', 'Time :{}'.format(str(self.time_h)), (520, 10, 50, 500), (0,0,0))
+        self.create_message('big', 'Time :{}'.format(str(self.time_h)), (520, 10, 50, 500), (0, 0, 0))
         self.create_message('big', '{}'.format(str(self.time_m)), (670, 10, 50, 500), (0, 0, 0))
         self.create_message('big', '{}'.format(str(self.time_s)), (720, 10, 50, 500), (0, 0, 0))
         pygame.display.flip()
-    
-    #Permet de gerer l'affichage des textes.
+
+    # Permet de gerer l'affichage des textes.
     def create_message(self, font, message, message_rectangle, color):
         if font == "small":
             font = pygame.font.SysFont('Lato', 20, False)
@@ -310,20 +353,25 @@ class Game:
 
         self.screen.blit(self.message, message_rectangle)
 
-    #Execute tout ce qui est nessaicere au bon démarage.
+    # Execute tout ce qui est nessaicere au bon démarage.
     def run(self):
         while self.running:
             self.handling_events()
             self.update(difficulty)
             self.display(difficulty)
 
-difficulty = input("hard or easy ? ") #Sélectionne entre difficile et facile.
 
-#Créé la fenetre
+
+
 pygame.init()
-screen = pygame.display.set_mode((1280, 720)) #
-pygame.display.set_caption('Snake') #Attribue un nom à la fenetre
-game = Game(screen)
-game.run()
+screen = pygame.display.set_mode((1280, 720))
+pygame.display.set_caption("Snake")
+
+title_screen = Title(screen)
+difficulty = title_screen.run()
+
+if difficulty:
+    game = Game(screen, difficulty)
+    game.run()
 
 pygame.quit()
